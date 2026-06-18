@@ -1,0 +1,6 @@
+{
+  "name": "ToolFK Digital Playground",
+  "description": "An interactive digital sandbox featuring 140+ utilities across AI, Dev, Conversion, Chinese heritage, and general categories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
