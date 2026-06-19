@@ -252,6 +252,21 @@ export default function App() {
     "Base64 File Converter"
   ];
 
+  const highFidelityLabs = [
+    { name: "Free Nanobanana Image Generator", display: "Nanobanana Creator V4", icon: "🍌", badge: "NEW" },
+    { name: "Audio & Voice Synth Lab", display: "Audio Synth Lab", icon: "🎙️" },
+    { name: "Interactive SQL Builder Sandbox", display: "SQL Schema Builder", icon: "💾" },
+    { name: "CSS Keyframe Studio", display: "CSS Animation Studio", icon: "🎬" },
+    { name: "3D Physics Sandbox", display: "3D Physics Canvas", icon: "☄️" },
+    { name: "a11y Contrast Checker", display: "a11y Contrast Checker", icon: "🎯" },
+    { name: "Color Palette Alchemist", display: "Color Palette Alchemist", icon: "🎨" },
+    { name: "Chinese Bazi Calculator", display: "Chinese Bazi Calc", icon: "☯️" },
+    { name: "Python3 Online Compiler", display: "Compiler Sandbox", icon: "🐍" },
+    { name: "JSON Tool (JSON Editor)", display: "JSON formatting Lab", icon: "📁" },
+    { name: "Regex Tester", display: "Regex Tester Playground", icon: "🔍" },
+    { name: "Base64 File Converter", display: "Base64 File Encoder", icon: "🔄" }
+  ];
+
   return (
     <div className={`min-h-screen text-zinc-200 font-sans p-4 sm:p-6 select-none ${obsMode ? 'bg-transparent' : 'bg-[#03060c] bg-[radial-gradient(circle_at_10%_20%,#0a0f1e,#03060c)]'}`}>
       <div id="playground-container" className="max-w-7xl mx-auto space-y-6">
@@ -352,26 +367,42 @@ export default function App() {
                 })}
               </div>
 
-              {/* Quick Preset Bookmark list of premium tools */}
-              <div className="border-t border-zinc-900 pt-3 space-y-2">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block px-1">Fast Utilities Bookmarks</span>
-                <div className="grid grid-cols-1 gap-1">
-                  {activeBookmarks.map((bk) => {
-                    const matched = TOOLS_CATALOG.find((t) => t.name === bk);
-                    const isSelected = selectedTool.name === bk;
+              {/* High-Fidelity Interactive Sandbox Labs Launcher */}
+              <div className="border-t border-zinc-900 pt-3.5 space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block">
+                    ✨ High-Fidelity Active Labs
+                  </span>
+                  <span className="bg-yellow-500/10 text-yellow-500 px-1 rounded text-[8px] font-mono font-bold animate-pulse">12 CORES</span>
+                </div>
+                <div className="grid grid-cols-1 gap-1.5 max-h-[300px] overflow-y-auto pr-1 select-none">
+                  {highFidelityLabs.map((lab) => {
+                    const matched = TOOLS_CATALOG.find((t) => t.name === lab.name);
+                    const isSelected = selectedTool.name === lab.name;
                     return (
                       <button
-                        key={bk}
+                        key={lab.name}
                         onClick={() => {
                           if (matched) setSelectedTool(matched);
                         }}
-                        className={`text-left px-2 py-1.5 text-[10px] font-mono rounded truncate transition-colors ${
-                          isSelected 
-                            ? "bg-[#ff2d55]/10 text-red-400 border border-red-950 font-bold" 
-                            : "text-zinc-500 hover:text-zinc-400 hover:bg-zinc-900/20"
+                        className={`text-left p-2 rounded-xl flex items-center justify-between gap-2 border transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-gradient-to-r from-yellow-500/10 to-red-650/5 border-yellow-500/40 text-yellow-400 font-bold shadow-sm shadow-yellow-500/5"
+                            : "bg-zinc-950/40 hover:bg-[#090e18] text-zinc-400 hover:text-zinc-200 border-zinc-900/60 hover:border-zinc-800"
                         }`}
+                        title={lab.name}
                       >
-                        🔖 {bk}
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className={`text-sm shrink-0 ${isSelected ? "animate-bounce" : ""}`}>{lab.icon}</span>
+                          <span className="truncate text-[10.5px] font-mono tracking-tight">{lab.display}</span>
+                        </div>
+                        {lab.badge ? (
+                          <span className="bg-yellow-500/10 text-yellow-500 text-[8px] px-1 py-0.5 rounded font-mono font-bold shrink-0">{lab.badge}</span>
+                        ) : isSelected ? (
+                          <div className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse shrink-0"></div>
+                        ) : (
+                          <span className="text-[8px] font-mono text-zinc-600 tracking-tighter uppercase shrink-0">ACTIVE</span>
+                        )}
                       </button>
                     );
                   })}

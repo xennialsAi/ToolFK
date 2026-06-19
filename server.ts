@@ -38,16 +38,16 @@ async function generateWithRetryAndFallback(client: GoogleGenAI, contents: strin
   // Use lightweight first to help speed if simple, else pro.
   // Switch models if it's not working fast enough.
   const modelsToTry = isComplexTask ? [
+    "gemini-3.1-pro-preview",
     "gemini-2.5-pro",
+    "gemini-3.5-flash",
     "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite-preview-02-05", 
-    "gemini-1.5-pro"
+    "gemini-3.1-flash-lite"
   ] : [
+    "gemini-3.5-flash",
     "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-2.5-pro",
-    "gemini-1.5-flash"
+    "gemini-3.1-pro-preview",
+    "gemini-3.1-flash-lite"
   ];
 
   let lastError: any = null;
@@ -130,8 +130,49 @@ Generated response:
 
     res.json({ status: "success", text: response.text });
   } catch (err: any) {
-    console.error("AI Text generation failed:", err);
-    res.status(500).json({ status: "error", error: err?.message || "Internal server error." });
+    console.error("Gemini API Error Details:", err);
+    res.status(500).json({ status: "error", error: "Failed to generate text output", details: err?.message || "Internal server error." });
+  }
+});
+
+// API for Nanobanana custom image / vector SVG generation
+app.post("/api/ai/image", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+    if (!prompt) {
+      return res.status(400).json({ status: "error", error: "Prompt is required." });
+    }
+
+    const client = getGeminiClient();
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    const sysInstruction = `You are an expert Frontend Clipart Developer and SVG artist. Based on user requirements, you generate clean, beautiful, scalable, raw, valid vector SVG files representing high-tech design models (specifically futuristic conceptual bananas or nanobananas with glowing wireframes and HUD indicators).
+ALWAYS return ONLY raw, valid SVG XML block, starting with <svg and ending with </svg>. Do not wrap in markdown comments, do not say "here is your code", do not provide explanations, no leading or trailing commentary. Ensure the SVG fits inside a 500x500 box, includes deep high-contrast gradients and cyberpunk aesthetics matching specified parameters, and scales beautifully within dark mode UIs.`;
+
+    if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey.trim() === "") {
+      // Return empty so client triggers highly functional procedural fallback
+      return res.json({ status: "success", simulated: true, svg: "" });
+    }
+
+    const response = await generateWithRetryAndFallback(client, prompt, {
+      systemInstruction: sysInstruction,
+      temperature: 0.4,
+    }, true /* Complex task formatting */);
+
+    let rawSvg = response.text || "";
+    // Clean any accidental markdown wrap
+    rawSvg = rawSvg.replace(/```xml/g, "").replace(/```html/g, "").replace(/```svg/g, "").replace(/```/g, "").trim();
+    if (!rawSvg.startsWith("<svg")) {
+      const idx = rawSvg.indexOf("<svg");
+      if (idx !== -1) {
+        rawSvg = rawSvg.substring(idx);
+      }
+    }
+
+    res.json({ status: "success", svg: rawSvg });
+  } catch (err: any) {
+    console.error("Gemini Image API Error:", err);
+    res.status(500).json({ status: "error", error: "Failed to generate custom AI Clipart", details: err?.message || "Internal server error." });
   }
 });
 
@@ -184,8 +225,8 @@ ALWAYS return ONLY the raw SVG xml block, starting with <svg and ending with </s
 
     res.json({ status: "success", svg: rawSvg });
   } catch (err: any) {
-    console.error("Clipart SVG generation failed:", err);
-    res.status(500).json({ status: "error", error: err?.message || "Internal server error." });
+    console.error("Gemini API Error Details:", err);
+    res.status(500).json({ status: "error", error: "Failed to generate clipart", details: err?.message || "Internal server error." });
   }
 });
 
